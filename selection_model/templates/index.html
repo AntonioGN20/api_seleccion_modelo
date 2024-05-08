@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección del Modelo - API</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Estilos para los contenedores */
+        #f1-score, #model-params, #cv-results, #best-params {
+            margin-bottom: 40px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para las tablas */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        td {
+            color: #333;
+        }
+
+        /* Estilos para los encabezados */
+        h1, h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Estilos específicos para las tablas */
+        #f1-score-table th:first-child,
+        #model-params-table th:first-child,
+        #cv-results-table th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        #f1-score-table th:last-child,
+        #model-params-table th:last-child,
+        #cv-results-table th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        #f1-score-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        #best-params-value {
+            font-style: italic;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <h1>Selección del Modelo - Información</h1>
+    <div id="f1-score">
+        <h2>F1 Score en conjunto de validación</h2>
+        <table id="f1-score-table">
+            <thead>
+                <tr>
+                    <th>F1 Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="f1-score-value"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="model-params">
+        <h2>Parámetros del modelo</h2>
+        <table id="model-params-table">
+            <thead>
+                <tr>
+                    <th>Parámetro</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Max Depth</td>
+                    <td id="max-depth-value"></td>
+                </tr>
+                <tr>
+                    <td>N Estimators</td>
+                    <td id="n-estimators-value"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="cv-results">
+        <h2>Resultados de la búsqueda</h2>
+        <table id="cv-results-table">
+            <!-- Aquí se insertarán las tablas de resultados de búsqueda -->
+        </table>
+    </div>
+
+    <div id="best-params">
+        <h2>Mejores hiperparámetros del modelo final</h2>
+        <p id="best-params-value"></p>
+    </div>
+
+    <script>
+        // Realizar una solicitud GET a la API
+        fetch('/f1_score/')
+            .then(response => response.json())
+            .then(data => {
+                // Mostrar el F1 Score
+                document.getElementById('f1-score-value').textContent = data.f1_score_validation;
+                // Mostrar los parámetros del modelo
+                document.getElementById('max-depth-value').textContent = data.max_depth;
+                document.getElementById('n-estimators-value').textContent = data.n_estimators;
+                // Mostrar los resultados de la búsqueda
+                const cvResultsTable = document.getElementById('cv-results-table');
+                const cvResultsData = data.cv_results;
+                Object.keys(cvResultsData).forEach(key => {
+                    const row = cvResultsTable.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    cell1.textContent = key;
+                    cell2.textContent = cvResultsData[key];
+                });
+                // Mostrar los mejores hiperparámetros del modelo final
+                document.getElementById('best-params-value').textContent = JSON.stringify(data.best_params);
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
